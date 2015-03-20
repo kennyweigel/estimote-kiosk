@@ -1,1 +1,1 @@
-# estimote-kiosk
+# estimote-proximity
