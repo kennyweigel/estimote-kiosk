@@ -31,6 +31,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         56493: UIColor(red: 16/255, green: 105/255, blue: 230/255, alpha: 1)// dark blue
     ]
     
+    // holds the closest estimote
+    var currentBeacon: CLBeacon = CLBeacon()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -73,7 +76,39 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 }
             }
             
+            if (closestBeacon.minor != currentBeacon.minor) {
+                println("change")
+                println(closestBeacon.accuracy)
+                currentBeacon = closestBeacon
+                testPost()
+
+            }
+            
+
+            
             self.view.backgroundColor = self.colors[closestBeacon.minor.integerValue]
         }
+    }
+    
+    func testPost()
+    {
+        let request = NSMutableURLRequest(URL: NSURL(string: "http://estimote-leaderboard.herokuapp.com/player/addscore")!)
+        request.HTTPMethod = "POST"
+        let postString = "estimoteMinor=test&score=1"
+        request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(request) {
+            data, response, error in
+            
+            if error != nil {
+                println("error=\(error)")
+                return
+            }
+            
+            println("response = \(response)")
+            
+            let responseString = NSString(data: data, encoding: NSUTF8StringEncoding)
+            println("responseString = \(responseString)")
+        }
+        task.resume()
     }
 }
